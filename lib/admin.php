@@ -49,7 +49,7 @@ class GlobalUserReset_Admin {
 			// Set my redirect URL.
 			$link   = add_query_arg( array( 'gupr-process' => 1, 'error' => 1, 'reason' => 'checkmark' ), $link );
 
-			// and do the redirect
+			// And do the redirect.
 			wp_safe_redirect( $link );
 			exit;
 		}
@@ -60,7 +60,7 @@ class GlobalUserReset_Admin {
 			// Set my redirect URL.
 			$link   = add_query_arg( array( 'gupr-process' => 1, 'error' => 1, 'reason' => 'users' ), $link );
 
-			// and do the redirect
+			// And do the redirect.
 			wp_safe_redirect( $link );
 			exit;
 		}
@@ -71,7 +71,7 @@ class GlobalUserReset_Admin {
 			// Set my redirect URL.
 			$link   = add_query_arg( array( 'gupr-process' => 1, 'error' => 1, 'reason' => 'process' ), $link );
 
-			// and do the redirect
+			// And do the redirect.
 			wp_safe_redirect( $link );
 			exit;
 		}
@@ -82,7 +82,7 @@ class GlobalUserReset_Admin {
 		// It worked, so redirect to a success page.
 		$link   = add_query_arg( array( 'gupr-process' => 1, 'success' => 1, 'count' => absint( $count ) ), $link );
 
-		// and do the redirect
+		// And do the redirect.
 		wp_safe_redirect( $link );
 		exit;
 	}
@@ -218,13 +218,13 @@ class GlobalUserReset_Admin {
 			echo '<form method="post" action="' . esc_url( $link ) . '">';
 
 				// Output a checkbox to make sure people know what's up.
-				echo '<p><label for="gupr-reset-check"><input required="required" type="checkbox" id="gupr-reset-check" name="gupr-reset-check" value="1">' . __( 'Yes, I am aware of what I am doing.', 'global-user-password-reset' ) . '</label></p>';
+				echo '<p><label for="gupr-reset-check"><input required="required" type="checkbox" id="gupr-reset-check" name="gupr-reset-check" value="1">' . esc_html__( 'Yes, I am aware of what I am doing.', 'global-user-password-reset' ) . '</label></p>';
 
 				// Output the button itself.
-				echo get_submit_button( __( 'Reset Passwords', 'global-user-password-reset' ), array( 'primary', 'large' ), 'gupr-reset-submit' );
+				submit_button( esc_html__( 'Reset Passwords', 'global-user-password-reset' ), 'primary', 'gupr-reset-submit' );
 
-				// Output the nonce field
-				echo wp_nonce_field( 'gupr-reset-nonce', 'gupr-reset-nonce', false, false );
+				// Output the nonce field.
+				wp_nonce_field( 'gupr-reset-nonce', 'gupr-reset-nonce', false, true );
 
 			echo '</form>';
 
@@ -235,10 +235,10 @@ class GlobalUserReset_Admin {
 	/**
 	 * Fetch all the user IDs contained on site.
 	 *
-	 * @param  integer $current   The current user ID.
-	 * @param  bool    $count     Whether to return the count instead of the IDs.
+	 * @param  integer $current  The current user ID.
+	 * @param  bool    $count    Whether to return the count instead of the IDs.
 	 *
-	 * @return array   $user_ids  The array of user IDs.
+	 * @return array   $users    The array of user IDs.
 	 */
 	public static function get_all_user_ids( $current = 0, $count = false ) {
 
@@ -250,34 +250,30 @@ class GlobalUserReset_Admin {
 		// Make sure we have a current user ID and it's the same person running the function.
 		$exclude    = ! empty( $current ) && absint( $current ) === get_current_user_id() ? $current : get_current_user_id();
 
-		// Call the global database object.
-		global $wpdb;
+		// Set my args for the `get_users` call.
+		$args   = array(
+			'exclude'   => absint( $exclude ),
+			'fields'    => 'ID',
+		);
 
-		// Set up our query.
-		$query	= $wpdb->prepare("
-			SELECT	ID
-			FROM	$wpdb->users
-			WHERE	ID NOT LIKE '%d'
-		", absint( $exclude ) );
-
-		// Fetch the column data.
-		$user_ids   = $wpdb->get_col( $query );
+		// Filter the args and call the function itself.
+		$users  = get_users( apply_filters( 'gupr_user_query_args', $args ) );
 
 		// If we have none, just return false.
-		if ( empty( $user_ids ) ) {
+		if ( empty( $users ) ) {
 			return false;
 		}
 
 		// Return the array of IDs, or the count if requested.
-		return ! empty( $count ) ? count( $user_ids ) : $user_ids;
+		return ! empty( $count ) ? count( $users ) : $users;
 	}
 
 	/**
 	 * Run the reset function itself on the array of user IDs.
 	 *
-	 * @param  array  $users  The array of user IDs.
+	 * @param  array $users  The array of user IDs.
 	 *
-	 * @return bool           Whether or not the function succeeded.
+	 * @return bool          Whether or not the function succeeded.
 	 */
 	public static function reset_user_passwords( $users = array() ) {
 
