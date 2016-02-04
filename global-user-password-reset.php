@@ -5,7 +5,7 @@
  * Description: Reset all passwords on a site, excluding the current user.
  * Author: Andrew Norcross
  * Author URI: http://andrewnorcross.com/
- * Version: 0.0.1
+ * Version: 0.0.2
  * Text Domain: global-user-password-reset
  * Requires WP: 4.0
  * Domain Path: languages
@@ -25,7 +25,7 @@ if ( ! defined( 'GUPR_DIR' ) ) {
 
 // Define our version.
 if( ! defined( 'GUPR_VER' ) ) {
-	define( 'GUPR_VER', '0.0.1' );
+	define( 'GUPR_VER', '0.0.2' );
 }
 
 
